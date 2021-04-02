@@ -1,0 +1,7 @@
+---
+- import_tasks: packages.yml
+- import_tasks: mount_path.yml
+- import_tasks: fstab.yml
+- import_tasks: configuration.yml
+- import_tasks: backup_script.yml
+- import_tasks: crontab.yml

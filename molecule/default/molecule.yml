@@ -1,0 +1,65 @@
+---
+dependency:
+  name: galaxy
+  options:
+    ignore-certs: true
+    ignore-errors: true
+
+driver:
+  name: docker
+
+platforms:
+  # Ubuntu
+  - name: ubuntu2004
+    image: "geerlingguy/docker-ubuntu2004-ansible:latest"
+    pre_build_image: true
+  - name: ubuntu1804
+    image: "geerlingguy/docker-ubuntu1804-ansible:latest"
+    pre_build_image: true
+  # Debian
+  - name: debian10
+    image: "geerlingguy/docker-debian10-ansible:latest"
+    pre_build_image: true
+  - name: debian9
+    image: "geerlingguy/docker-debian9-ansible:latest"
+    pre_build_image: true
+
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      all:
+        cloud_backup:
+          - name: MyBackup
+            # NFS
+            nfs_src: 192.172.1.1:/folder
+            nfs_mount_path: nfs
+            # DavFS
+            davfs2_mount_path: davfs2
+            davfs2_src: https://webdav.myserver.com
+            davfs2_login: MyLogin
+            davfs2_password: MyPassword
+            # CryFS
+            cryfs_mount_path: cryfs
+        cloud_backup_configuration:
+          - name: MyBackup
+            # NFS
+            nfs_mount_path: nfs
+            # DavFS
+            davfs2_mount_path: davfs2
+            # CryFS
+            cryfs_password: CryFsPath
+            cryfs_basedir: TestBackup
+            cryfs_mount_path: cryfs
+            # Backup
+            rsync_options: -a
+            backup_source: SomeFolder
+            cron:
+                minute: 30
+                hour: 2
+                day: "*"
+                month: "*"
+                weekday: "*"
+
+verifier:
+  name: ansible

@@ -1,0 +1,173 @@
+#!/bin/sh
+
+###########################
+## Configuration         ##
+###########################
+
+CONFIGURATION_FILE=$1
+if [ -z "$CONFIGURATION_FILE" ]; then
+    "Configuration file is not specified"
+    exit 1
+fi
+
+SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+
+if [ -f "$SCRIPT_DIR/$CONFIGURATION_FILE" ]; then
+    . "$SCRIPT_DIR/$CONFIGURATION_FILE"
+else
+    echo "Configuratin file not exist"
+    exit 1
+fi
+
+###########################
+## Functions             ##
+###########################
+
+## Log message
+logMessage() {
+    echo "$(date +"%Y-%m-%d %T") $1" >> "$SCRIPT_DIR"/backup.log
+}
+
+## Mount NFS
+mountNfs() {
+    mount $1
+
+    if [ $? -ne 0 ]; then
+        logMessage "Mount NFS failed"
+        return 1
+    else
+        return 0
+    fi
+}
+
+## Umount NFS
+umountNfs() {
+    umount $1
+
+    if [ $? -ne 0 ]; then
+        logMessage "Umount NFS failed"
+        return 1
+    else
+        return 0
+    fi
+}
+
+## Mount davFS
+mountDavFS() {
+    mount $1
+
+    if [ $? -ne 0 ]; then
+        logMessage "Mount davFS failed"
+        return 1
+    else
+        return 0
+    fi
+}
+
+## Mount davFS
+umountDavFS() {
+    umount -i $1
+
+    if [ $? -ne 0 ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+umountDavFSWithAttempts() {
+    COUNT=0
+    RESULT=1
+
+    while [ "$COUNT" -lt "$DAVFS_UMOUNT_ATTEMPTS" ]
+    do
+
+        if umountDavFS $1; then
+            COUNT="$DAVFS_UMOUNT_ATTEMPTS"
+            RESULT=0
+        else
+            COUNT=$(( $COUNT + 1 ))
+            sleep $DAVFS_UMOUNT_DELAY_TIME
+        fi
+    done
+
+    if [ "$RESULT" -ne 0 ]; then
+        logMessage "Umount davFS failed with attempts [$COUNT]"
+    fi
+
+    return "$RESULT"
+}
+
+## Mount cryFS
+mountCryFS() {
+    echo -n "$1" | CRYFS_FRONTEND=noninteractive cryfs $2 $3
+
+    if [ $? -ne 0 ]; then
+        logMessage "Mount cryFS failed"
+        return 1
+    else
+        return 0
+    fi
+}
+
+## Umount cryFS
+umountCryFS() {
+    cryfs-unmount $1
+
+    if [ $? -ne 0 ]; then
+        logMessage "Umount cryFS failed"
+        return 1
+    else
+        return 0
+    fi
+}
+
+umountAll() {
+    umountCryFS $1
+    sleep 1
+    umountNfs $3
+    sleep 1
+    umountDavFSWithAttempts $2
+    logMessage "Umount all mount points"
+}
+
+###########################
+## Backup logic          ##
+###########################
+
+logMessage "Start of backup with configuration [$CONFIGURATION_FILE]"
+
+if mountNfs "$NFS_PARH"; then
+    logMessage "Mount NFS successfully"
+else
+    exit 1
+fi
+
+if mountDavFS "$DAVFS_PATH"; then
+    logMessage "Mount davFS successfully"
+else
+    sleep 2
+    umountNfs "$NFS_PARH"
+    exit 1
+fi
+
+if mountCryFS "$CRYFS_PASSWORD" "$CRYFS_BASEDIR" "$CRYFS_MOUNTPOINT"; then
+    logMessage "Mount CryFS successfully"
+else
+    sleep 2
+    umountNfs "$NFS_PARH"
+    sleep 2
+    umountDavFS "$DAVFS_PATH"
+    exit 1
+fi
+
+rsync "$RSYNC_OPTIONS" "$NFS_PARH/$BACKUP_SOURCE" "$CRYFS_MOUNTPOINT"
+if [ $? -ne 0 ]; then
+    logMessage "Sync failed"
+else
+    logMessage "Sync completed"
+fi
+
+umountAll "$CRYFS_MOUNTPOINT" "$DAVFS_PATH" "$NFS_PARH"
+
+logMessage "End of backup with configuration [$CONFIGURATION_FILE]"

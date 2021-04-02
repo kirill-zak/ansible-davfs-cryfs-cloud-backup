@@ -1,0 +1,28 @@
+---
+- name: Create directory for backup script
+  file:
+    path: "{{ cloud_backup_script_path }}"
+    state: directory
+    owner: "{{ cloud_backup_user }}"
+    group: "{{ cloud_backup_group }}"
+    mode: 0700
+
+- name: Create backup script
+  template:
+    src: backup.sh.j2
+    dest: "{{ cloud_backup_script_path }}/backup.sh"
+    owner: "{{ cloud_backup_user }}"
+    group: "{{ cloud_backup_group }}"
+    mode: 0700
+
+- name: Create backup configuration files
+  template:
+    src: backup.cfg.j2
+    dest: "{{ cloud_backup_script_path }}/{{ cfg_item.name }}.cfg"
+    owner: "{{ cloud_backup_user }}"
+    group: "{{ cloud_backup_group }}"
+    mode: 0700
+  with_items: "{{ cloud_backup_configuration }}"
+  loop_control:
+    loop_var: cfg_item
+  no_log: true

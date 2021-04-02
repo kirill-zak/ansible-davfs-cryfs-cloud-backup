@@ -1,0 +1,30 @@
+---
+- name: Create davfs2 mount path
+  file:
+    path: "{{ cloud_backup_script_path }}/{{ item.name }}/{{ item.davfs2_mount_path }}"
+    state: directory
+    owner: "{{ cloud_backup_user }}"
+    group: "{{ cloud_backup_group }}"
+    mode: 0700
+  with_items: "{{ cloud_backup }}"
+  no_log: true
+
+- name: Create nfs mount path
+  file:
+    path: "{{ cloud_backup_script_path }}/{{ item.name }}/{{ item.nfs_mount_path }}"
+    state: directory
+    owner: "{{ cloud_backup_user }}"
+    group: "{{ cloud_backup_group }}"
+    mode: 0700
+  with_items: "{{ cloud_backup }}"
+  no_log: true
+
+- name: Create CryFS mount path
+  file:
+    path: "{{ cloud_backup_script_path }}/{{ item.name }}/{{ item.cryfs_mount_path }}"
+    state: directory
+    owner: "{{ cloud_backup_user }}"
+    group: "{{ cloud_backup_group }}"
+    mode: 0700
+  with_items: "{{ cloud_backup }}"
+  no_log: true

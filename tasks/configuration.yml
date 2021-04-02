@@ -1,0 +1,41 @@
+---
+- name: Configure davfs2 locks
+  lineinfile: path=/etc/davfs2/davfs2.conf regexp="^# use_locks" line="use_locks        0"
+
+- name: Configure davfs2 cache size
+  lineinfile: path=/etc/davfs2/davfs2.conf regexp="^# cache_size" line="cache_size      0"
+
+- name: Configure davfs2 delay upload
+  lineinfile: path=/etc/davfs2/davfs2.conf regexp="^# delay_upload" line="delay_upload    0"
+
+- name: Allow to user run mount davfs command
+  file:
+    path: "{{ item }}"
+    mode: '4755'
+  loop:
+    - /usr/sbin/mount.davfs
+    - /usr/sbin/umount.davfs
+
+- name: Add davfs cridentials
+  lineinfile:
+    path: /etc/davfs2/secrets
+    line: "{{ item.davfs2_src }} {{ item.davfs2_login }} {{ item.davfs2_password }}"
+    state: present
+  no_log: true
+  with_items: "{{ cloud_backup }}"
+
+- name: Add backup group
+  group:
+    name: "{{ cloud_backup_group}}"
+    state: present
+
+- name: Add users into backup and davfs2 group
+  user:
+    name: "{{ cloud_backup_user }}"
+    comment: "Backup user"
+    group: "{{ cloud_backup_group }}"
+    groups: "{{ cloud_backup_group }}, davfs2"
+    append: yes
+    shell: /bin/bash
+    createhome: yes
+    generate_ssh_key: no

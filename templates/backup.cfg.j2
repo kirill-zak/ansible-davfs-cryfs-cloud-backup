@@ -1,0 +1,9 @@
+NFS_PARH='{{ cloud_backup_script_path }}/{{ cfg_item.name }}/{{ cfg_item.nfs_mount_path }}'
+DAVFS_PATH='{{ cloud_backup_script_path }}/{{ cfg_item.name }}/{{ cfg_item.davfs2_mount_path }}'
+DAVFS_UMOUNT_ATTEMPTS=5
+DAVFS_UMOUNT_DELAY_TIME=60
+CRYFS_PASSWORD='{{ cfg_item.cryfs_password }}'
+CRYFS_BASEDIR='{{ cloud_backup_script_path }}/{{ cfg_item.name }}/{{ cfg_item.davfs2_mount_path }}/{{ cfg_item.cryfs_basedir }}'
+CRYFS_MOUNTPOINT='{{ cloud_backup_script_path }}/{{ cfg_item.name }}/{{ cfg_item.cryfs_mount_path }}'
+RSYNC_OPTIONS='{{ cfg_item.rsync_options }}'
+BACKUP_SOURCE='{{ cfg_item.backup_source }}'

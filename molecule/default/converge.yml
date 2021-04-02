@@ -1,0 +1,16 @@
+---
+- name: Converge
+  hosts: all
+
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: true
+        cache_valid_time: 600
+      changed_when: false
+      when: ansible_pkg_mgr == "apt"
+
+  tasks:
+    - name: "Include ansible-davfs-cryfs-cloud-backup"
+      include_role:
+        name: "ansible-davfs-cryfs-cloud-backup"

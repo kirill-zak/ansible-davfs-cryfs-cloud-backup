@@ -1,0 +1,4 @@
+---
+cloud_backup_user: backup
+cloud_backup_group: backup
+cloud_backup_script_path: /opt/backup

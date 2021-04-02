@@ -1,0 +1,10 @@
+---
+- name: Install package
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - davfs2
+    - cryfs
+    - nfs-common
+    - cron

@@ -1,0 +1,15 @@
+---
+- name: Add task with backup script into crontab
+  cron:
+    name: "{{ cfg_item.name }}"
+    minute: "{{ cfg_item.cron.minute }}"
+    hour: "{{ cfg_item.cron.hour }}"
+    day: "{{ cfg_item.cron.day }}"
+    month: "{{ cfg_item.cron.month }}"
+    weekday: "{{ cfg_item.cron.weekday }}"
+    job: "{{ cloud_backup_script_path }}/backup.sh {{ cfg_item.name }}.cfg"
+    user: "{{ cloud_backup_user }}"
+  with_items: "{{ cloud_backup_configuration }}"
+  loop_control:
+    loop_var: cfg_item
+  no_log: true

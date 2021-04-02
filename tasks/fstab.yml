@@ -1,0 +1,22 @@
+---
+- name: Add DavFS2 mount path into fstab
+  mount:
+    path: "{{ cloud_backup_script_path }}/{{ item.name }}/{{ item.davfs2_mount_path }}"
+    src: "{{ item.davfs2_src }}"
+    fstype: davfs
+    opts: noauto,_netdev,rw,user
+    state: present
+    backup: yes
+  no_log: true
+  with_items: "{{ cloud_backup }}"
+
+- name: Add nfs mount path into fstab
+  mount:
+    path: "{{ cloud_backup_script_path }}/{{ item.name }}/{{ item.nfs_mount_path }}"
+    src: "{{ item.nfs_src }}"
+    fstype: nfs
+    opts: ro,user,noauto
+    state: present
+    backup: yes
+  no_log: true
+  with_items: "{{ cloud_backup }}"
