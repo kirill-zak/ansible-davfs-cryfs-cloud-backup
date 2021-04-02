@@ -51,6 +51,8 @@ Example configuration:
               weekday: "*"
 ```
 
+Note: You mast using Ansible Vault for store sensetive information like credential.
+
 Dependencies
 ------------
 
