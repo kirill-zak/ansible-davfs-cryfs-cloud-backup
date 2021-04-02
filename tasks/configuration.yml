@@ -11,7 +11,7 @@
 - name: Allow to user run mount davfs command
   file:
     path: "{{ item }}"
-    mode: '4755'
+    mode: "4755"
   loop:
     - /usr/sbin/mount.davfs
     - /usr/sbin/umount.davfs

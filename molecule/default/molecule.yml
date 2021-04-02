@@ -5,6 +5,11 @@ dependency:
     ignore-certs: true
     ignore-errors: true
 
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+
 driver:
   name: docker
 
@@ -55,11 +60,11 @@ provisioner:
             rsync_options: -a
             backup_source: SomeFolder
             cron:
-                minute: 30
-                hour: 2
-                day: "*"
-                month: "*"
-                weekday: "*"
+              minute: 30
+              hour: 2
+              day: "*"
+              month: "*"
+              weekday: "*"
 
 verifier:
   name: ansible
