@@ -65,7 +65,7 @@ Example Playbook
 ---
 - name: Install backup script
   roles:
-    - role: ansible-davfs-cryfs-cloud-backup
+    - role: kirill_zak.ansible_davfs_cryfs_cloud_backup
 ```
 
 License
