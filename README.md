@@ -77,3 +77,8 @@ Author Information
 ------------------
 
 https://kirill-zak.ru
+
+Build status
+------------
+
+[![Build Status](https://travis-ci.com/kirill-zak/ansible-davfs-cryfs-cloud-backup.svg?branch=master)](https://travis-ci.com/kirill-zak/ansible-davfs-cryfs-cloud-backup)
